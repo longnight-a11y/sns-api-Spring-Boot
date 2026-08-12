@@ -32,7 +32,7 @@ public class GlobalExceptionHandler {
         problem.setDetail("One or more fields are invalid.");
 
         e.getBindingResult().getFieldErrors()
-                .forEach(err -> problem.setProperty(err.getField(), err.getDefaultMessage());
+                .forEach(err -> problem.setProperty(err.getField(), err.getDefaultMessage()));
         return problem;
     }
 }
