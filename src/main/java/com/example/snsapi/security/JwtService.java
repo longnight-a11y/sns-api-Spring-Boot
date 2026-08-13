@@ -1,11 +1,10 @@
-package com.example.snsapi.service;
+package com.example.snsapi.security;
 
 import com.example.snsapi.exception.InvalidTokenException;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
-import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
