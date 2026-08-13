@@ -1,4 +1,4 @@
-package com.example.snsapi.service;
+package com.example.snsapi.security;
 
 import com.example.snsapi.repository.UserRepository;
 import jakarta.servlet.FilterChain;
