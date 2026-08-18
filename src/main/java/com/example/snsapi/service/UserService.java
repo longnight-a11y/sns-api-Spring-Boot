@@ -5,7 +5,6 @@ import com.example.snsapi.dto.UserResponse;
 import com.example.snsapi.entity.User;
 import com.example.snsapi.exception.ConflictException;
 import com.example.snsapi.repository.UserRepository;
-import com.example.snsapi.security.JwtService;
 import jakarta.transaction.Transactional;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -32,10 +31,6 @@ public class UserService {
         user.setHashedPassword(passwordEncoder.encode(request.password()));
         User saved = userRepository.save(user);
         return toResponse(saved);
-    }
-
-    public UserResponse getMe(User currentUser){
-        return toResponse(currentUser);
     }
 
 
