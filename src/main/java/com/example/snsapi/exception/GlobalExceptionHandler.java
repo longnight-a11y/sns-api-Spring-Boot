@@ -13,6 +13,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
+    // 401
     @ExceptionHandler(InvalidTokenException.class)
     public ProblemDetail handleInvalidToken(InvalidTokenException e){
 
@@ -23,6 +24,7 @@ public class GlobalExceptionHandler {
 
     }
 
+    // 401
     @ExceptionHandler(InvalidCredentialsException.class)
     public ProblemDetail handleInvalidCredentials(InvalidCredentialsException e){
 
@@ -32,6 +34,7 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    // 400
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ProblemDetail handleValidation(MethodArgumentNotValidException e){
 
@@ -48,6 +51,7 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    // 404
     @ExceptionHandler(ResourceNotFoundException.class)
     public ProblemDetail handleResourceNotFound(ResourceNotFoundException e){
 
@@ -57,6 +61,7 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    // 403
     @ExceptionHandler(AccessDeniedException.class)
     public ProblemDetail handleAccessDenied(AccessDeniedException e){
 
@@ -66,6 +71,7 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    // 409
     @ExceptionHandler(ConflictException.class)
     public ProblemDetail handleConflict(ConflictException e){
 
@@ -75,6 +81,7 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    // 500
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpectedException(Exception e){
 
