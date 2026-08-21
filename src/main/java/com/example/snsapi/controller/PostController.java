@@ -10,6 +10,9 @@ import jakarta.validation.Valid;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/posts")
 public class PostController {
@@ -32,5 +35,28 @@ public class PostController {
     public PageResponse<PostResponse> getPosts(@RequestParam(defaultValue = "1") int page,
                                                @RequestParam(defaultValue = "50") int size){
         return postService.getPosts(page, size);
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "Get My Posts")
+    public PageResponse<PostResponse> getMyPosts(@RequestParam(defaultValue = "1") int page,
+                                                 @RequestParam(defaultValue = "50") int size,
+                                                 @AuthenticationPrincipal User user){
+        return postService.getMyPosts(page, size, user);
+    }
+
+    @GetMapping("/{postId}")
+    @Operation(summary = "Get Single Post")
+    public PostResponse getSinglePost(@PathVariable UUID postId){
+        return postService.getSinglePost(postId);
+    }
+
+    // updatePost
+
+    @DeleteMapping("/{postId}")
+    @Operation(summary = "Delete Post")
+    public Map<String, String> deletePost(@PathVariable UUID postId,
+                                          @AuthenticationPrincipal User user){
+        return postService.deletePost(postId, user);
     }
 }
