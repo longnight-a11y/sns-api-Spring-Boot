@@ -80,6 +80,16 @@ public class GlobalExceptionHandler {
         return problem;
     }
 
+    // 422
+    @ExceptionHandler(InvalidRequestException.class)
+    public ProblemDetail handleInvalidRequest(InvalidRequestException e){
+
+        ProblemDetail problem = ProblemDetail.forStatusAndDetail(HttpStatus.UNPROCESSABLE_CONTENT, e.getMessage());
+        problem.setTitle("Unprocessable Entity");
+
+        return problem;
+    }
+
     // 500
     @ExceptionHandler(Exception.class)
     public ProblemDetail handleUnexpectedException(Exception e){
