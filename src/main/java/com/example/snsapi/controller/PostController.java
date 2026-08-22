@@ -3,6 +3,7 @@ package com.example.snsapi.controller;
 import com.example.snsapi.dto.PageResponse;
 import com.example.snsapi.dto.PostCreateRequest;
 import com.example.snsapi.dto.PostResponse;
+import com.example.snsapi.dto.PostUpdateRequest;
 import com.example.snsapi.entity.User;
 import com.example.snsapi.service.PostService;
 import io.swagger.v3.oas.annotations.Operation;
@@ -51,7 +52,13 @@ public class PostController {
         return postService.getSinglePost(postId);
     }
 
-    // updatePost
+    @PatchMapping("/{postId}")
+    @Operation(summary = "Update Post")
+    public PostResponse updatePost(@PathVariable UUID postId,
+                                   @RequestBody PostUpdateRequest request,
+                                   @AuthenticationPrincipal User user){
+        return postService.updatePost(postId, request, user);
+    }
 
     @DeleteMapping("/{postId}")
     @Operation(summary = "Delete Post")

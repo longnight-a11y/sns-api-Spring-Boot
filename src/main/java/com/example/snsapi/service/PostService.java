@@ -1,12 +1,10 @@
 package com.example.snsapi.service;
 
-import com.example.snsapi.dto.PageResponse;
-import com.example.snsapi.dto.PostCreateRequest;
-import com.example.snsapi.dto.PostResponse;
-import com.example.snsapi.dto.UserResponse;
+import com.example.snsapi.dto.*;
 import com.example.snsapi.entity.Post;
 import com.example.snsapi.entity.User;
 import com.example.snsapi.exception.AccessDeniedException;
+import com.example.snsapi.exception.InvalidRequestException;
 import com.example.snsapi.exception.ResourceNotFoundException;
 import com.example.snsapi.repository.PostRepository;
 import jakarta.transaction.Transactional;
@@ -60,8 +58,33 @@ public class PostService {
         return toResponse(post);
     }
 
-    // updatePost will be here
+    @Transactional
+    public PostResponse updatePost(UUID postId, PostUpdateRequest request, User user){
 
+        Post post = postRepository.findByIdWithUser(postId)
+                .orElseThrow(()-> new ResourceNotFoundException("Post not found"));
+        checkOwnership(user, post, "update");
+
+        if(request.title() == null && request.content() == null){
+            throw new InvalidRequestException("At least one field must be provided");
+        }
+        if(request.title() != null){
+            if(request.title().isBlank()){
+                throw new InvalidRequestException("Title must not be blank");
+            }
+            post.setTitle(request.title());
+        }
+        if(request.content() != null){
+            if(request.content().isBlank()){
+                throw new InvalidRequestException("Content must not be blank");
+            }
+            post.setContent(request.content());
+        }
+        // postRepository.save(post) is not necessary here
+        return toResponse(post);
+    }
+
+    @Transactional
     public Map<String, String> deletePost(UUID postId, User user){
 
         Post post = postRepository.findByIdWithUser(postId)
