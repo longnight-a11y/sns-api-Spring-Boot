@@ -1,5 +1,6 @@
 package com.example.snsapi.fixture;
 
+import com.example.snsapi.dto.UserCreateRequest;
 import com.example.snsapi.entity.User;
 
 import java.util.UUID;
@@ -20,5 +21,9 @@ public final class UserFixture {
         User user = user();
         user.setUsername(username);
         return user;
+    }
+
+    public static UserCreateRequest request(){
+        return new UserCreateRequest("Mikasa", "testpass");
     }
 }
