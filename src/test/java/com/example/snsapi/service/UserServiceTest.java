@@ -52,14 +52,14 @@ public class UserServiceTest {
         // Act
         UserResponse response = userService.createUser(request);
         // Assert
-        assertEquals("Mikasa", response.username());
+        assertEquals("Mikasa", response.username());  // check whether the service returns proper response
 
         ArgumentCaptor<User> captor = ArgumentCaptor.forClass(User.class);
         // check whether userRepository.save() is called, and captor the saved contents
         verify(userRepository).save(captor.capture());
 
         User user = captor.getValue();
-        assertEquals("Mikasa", user.getUsername());
+        assertEquals("Mikasa", user.getUsername());  // check whether userRepository saved proper data
         assertEquals("hashedpassword", user.getHashedPassword());
 
         verify(userRepository).existsByUsername("Mikasa");

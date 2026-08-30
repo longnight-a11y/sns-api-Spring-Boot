@@ -1,5 +1,6 @@
 package com.example.snsapi.fixture;
 
+import com.example.snsapi.dto.PostCreateRequest;
 import com.example.snsapi.entity.Post;
 import com.example.snsapi.entity.User;
 
@@ -16,5 +17,9 @@ public class PostFixture {
         post.setContent("content");
         post.setUser(user);
         return post;
+    }
+
+    public static PostCreateRequest request(){
+        return new PostCreateRequest("Test Post", "content");
     }
 }
