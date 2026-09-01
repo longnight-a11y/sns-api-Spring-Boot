@@ -7,6 +7,7 @@ import com.example.snsapi.dto.PostUpdateRequest;
 import com.example.snsapi.entity.Post;
 import com.example.snsapi.entity.User;
 import com.example.snsapi.exception.AccessDeniedException;
+import com.example.snsapi.exception.InvalidRequestException;
 import com.example.snsapi.exception.ResourceNotFoundException;
 import com.example.snsapi.fixture.PostFixture;
 import com.example.snsapi.fixture.UserFixture;
@@ -31,8 +32,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.eq;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 
 @ExtendWith(MockitoExtension.class)
 public class PostServiceTest {
@@ -179,7 +179,69 @@ public class PostServiceTest {
         verify(postRepository).findByIdWithUser(post.getId());
     }
 
-    // updatePost_noFieldProvided どっちもnull 次回ここから！！！！
+    @Test
+    void updatePost_noFieldProvided(){
+        PostUpdateRequest request = new PostUpdateRequest(null, null);
+        when(postRepository.findByIdWithUser(post.getId())).thenReturn(Optional.of(post));
 
-    // updatePost_blankField
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                () -> postService.updatePost(post.getId(), request, user));
+        assertEquals("At least one field must be provided", exception.getMessage());
+        verify(postRepository).findByIdWithUser(post.getId());
+    }
+
+    @Test
+    void updatePost_blankTitle(){
+        PostUpdateRequest request = new PostUpdateRequest(" ", null);
+        when(postRepository.findByIdWithUser(post.getId())).thenReturn(Optional.of(post));
+
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                () -> postService.updatePost(post.getId(), request, user));
+        assertEquals("Title must not be blank", exception.getMessage());
+        verify(postRepository).findByIdWithUser(post.getId());
+    }
+
+    @Test
+    void updatePost_blankContent(){
+        PostUpdateRequest request = new PostUpdateRequest(null, " ");
+        when(postRepository.findByIdWithUser(post.getId())).thenReturn(Optional.of(post));
+
+        InvalidRequestException exception = assertThrows(InvalidRequestException.class,
+                () -> postService.updatePost(post.getId(), request, user));
+        assertEquals("Content must not be blank", exception.getMessage());
+        verify(postRepository).findByIdWithUser(post.getId());
+    }
+
+    @Test
+    void deletePost_success(){
+        when(postRepository.findByIdWithUser(post.getId())).thenReturn(Optional.of(post));
+        // Act
+        postService.deletePost(post.getId(), user);
+
+        verify(postRepository).delete(post);
+    }
+
+    @Test
+    void deletePost_notFound(){
+        UUID id = UUID.randomUUID();
+        when(postRepository.findByIdWithUser(id)).thenReturn(Optional.empty());
+
+        ResourceNotFoundException exception = assertThrows(ResourceNotFoundException.class,
+                () -> postService.deletePost(id, user));
+        assertEquals("Post not found", exception.getMessage());
+        verify(postRepository).findByIdWithUser(id);
+    }
+
+    @Test
+    void deletePost_notAuthorized(){
+        User otherUser = new User();
+        otherUser.setId(UUID.randomUUID());
+        when(postRepository.findByIdWithUser(post.getId())).thenReturn(Optional.of(post));
+
+        AccessDeniedException exception = assertThrows(AccessDeniedException.class,
+                () -> postService.deletePost(post.getId(), otherUser));
+        assertEquals("Not authorized to delete this task", exception.getMessage());
+        verify(postRepository).findByIdWithUser(post.getId());
+        verify(postRepository, never()).delete(any(Post.class));
+    }
 }
