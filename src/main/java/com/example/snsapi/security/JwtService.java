@@ -9,7 +9,9 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import javax.crypto.SecretKey;
+import java.nio.charset.StandardCharsets;
 import java.sql.Date;
+import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.UUID;
@@ -18,15 +20,18 @@ import java.util.UUID;
 public class JwtService {
 
     private final SecretKey key;
+    private final Clock clock;
+
     private static final long EXPIRE_MINUTES = 30;
 
-    public JwtService(@Value("${app.jwt.secret}") String key){
-        this.key = Keys.hmacShaKeyFor(key.getBytes());
+    public JwtService(@Value("${app.jwt.secret}") String key, Clock clock){
+        this.key = Keys.hmacShaKeyFor(key.getBytes(StandardCharsets.UTF_8));
+        this.clock = clock;
     }
 
     public String createToken(UUID userId){
 
-        Instant now = Instant.now();
+        Instant now = clock.instant();
         Instant expiry = now.plus(Duration.ofMinutes(EXPIRE_MINUTES));
 
         return Jwts.builder()
@@ -42,6 +47,7 @@ public class JwtService {
         try{
             String sub = Jwts.parser()
                     .verifyWith(key)
+                    .clock(()->Date.from(clock.instant()))
                     .build()
                     .parseSignedClaims(token)
                     .getPayload()
