@@ -1,4 +1,15 @@
 services:
+
+  app:
+    build: .
+    container_name: snsapi-app
+    ports:
+      - "8080:8080"
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+
   postgres:
     image: postgres:17
 
@@ -14,6 +25,12 @@ services:
 
     volumes:
       - postgres-data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U postgres -d snsapi-db" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
 
 volumes:
   postgres-data:
