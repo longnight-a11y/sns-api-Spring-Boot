@@ -37,12 +37,12 @@ public class JwtServiceTest {
     }
 
     @Test
-    void createToken_success(){
+    void createToken_decodeToken_success(){
         UUID userId = UUID.randomUUID();
         // Act
         String token = jwtService.createToken(userId);
-        // Assert
         UUID decodedUserId = jwtService.decodeToken(token);
+        // Assert
         assertEquals(userId, decodedUserId);
     }
 
@@ -55,7 +55,7 @@ public class JwtServiceTest {
     }
 
     @Test
-    void decodeToken(){
+    void decodeToken_expired(){
         UUID userId = UUID.randomUUID();
         JwtService issuingJwtService = createJwtService(Instant.parse("2026-01-01T00:00:00Z"));
         String token = issuingJwtService.createToken(userId);
