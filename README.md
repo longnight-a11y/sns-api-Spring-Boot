@@ -56,6 +56,7 @@ For example:
 - Using pagination to display posts for scalability
 - Layered architecture separates JWT authentication, HTTP handling, business logic, and data access for maintainability and testability
 - Bean validation prevents invalid user inputs
+- Unit tests cover user management, post management, authentication, and JWT token handling using JUnit and Mockito
 
 ---
 ## Architecture
@@ -63,37 +64,31 @@ This project follows a layered architecture.
 
 ### System Architecture Diagram
 ```
-         Client
-           │
-           │ HTTP Request, JWT
-           ▼
-┌──────────────────────┐
-│ Spring Security      │
-│ JWT Authentication   │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│ Controller           │
-│ HTTP request/response│
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│ Service              │
-│ Business logic       │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│ Repository           │
-│ Data access          │
-└──────────┬───────────┘
-           │
-           ▼
-┌──────────────────────┐
-│ PostgreSQL           │
-└──────────────────────┘
+              Client
+                 │
+                 │ HTTP / JWT
+                 ▼
+   ┌───────────────────────────┐
+   │       Docker Compose      │
+   │                           │
+   │  ┌─────────────────────┐  │
+   │  │ Spring Boot         │  │
+   │  │                     │  │
+   │  │ Spring Security     │  │
+   │  │       ↓             │  │
+   │  │ Controller          │  │
+   │  │       ↓             │  │
+   │  │ Service             │  │
+   │  │       ↓             │  │
+   │  │ Repository          │  │
+   │  └──────────┬──────────┘  │
+   │             │             │
+   │             ▼             │
+   │  ┌─────────────────────┐  │
+   │  │ PostgreSQL 17       │  │
+   │  └─────────────────────┘  │
+   │                           │
+   └───────────────────────────┘
 ```
 
 ### Responsibilities
@@ -135,7 +130,8 @@ instead of sending entire resource. It makes the API user-friendly.
 
 ### This project uses GitHub Actions for continuous integration.
 
-Every push ad pull requests automatically:
+Every push and pull requests automatically:
+- Runs unit tests
 - Builds the project
 - Verifies the application can be compiled successfully
 
@@ -322,11 +318,83 @@ http://localhost:8080/swagger-ui/index.html
 ---
 ## Testing
 
+Unit tests are implemented using JUnit and Mockito.
+
+The tests cover the main business logic of the application.
+
+### UserService
+- User creation
+- Duplicate username handling
+
+### PostService
+- Post creation
+- Post retrieval (pagination)
+- Post update
+- Post deletion
+
+### AuthService
+- Successful login
+- Invalid username or password
+
+### JwtService
+- JWT creation
+- JWT decoding
+- Invalid token handling
+- Expired token handling
+
+### Testing Strategy
+
+Service-layer unit tests focus on business logic without starting
+the full Spring application context.  
+Mockito is used to isolate service dependencies such as repositories
+and password encoders.  
+JwtService is tested with the real JWT implementation because 
+token creation, validation, and expiration handling are its core responsibilities.
+
+---
+
+## Docker
+
+The application and PostgreSQL database can be run using Docker compose.
+The Spring Boot application is containerized using a Dockerfile, while PostgreSQL
+uses the official PostgreSQL Docker image.
+
+The containers communicate through the Docker Compose Network.
+
+### Build and Run
+
+Build the Spring boot application:  
+(Make sure to delete your target folder first!)
+```
+mvn clean package
+```
+Build the Docker image and start the containers:
+```
+docker compose up --build
+```
+To stop the containers:
+```
+docker compose down
+```
+The application is available at `http://localhost:8080`.
+PostgreSQL is exposed on port 5433 on te host machine.
+
+### Container Architecture
+
+```
+Docker Compose
+│
+├── Spring Boot application
+│   └── Dockerfile
+│
+└── PostgreSQL 17
+    └── Official PostgreSQL image
+```
 
 ---
 ## Future Improvements
 
-- Unit Test
+- Integration Test
 - Deployment
 - Database Migration
 
